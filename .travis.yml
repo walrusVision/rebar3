@@ -12,6 +12,7 @@ after_script: "./rebar3 coveralls send"
 branches:
   only:
     - master
+    - s3_test
 before_deploy: "rm -rf !(rebar3)"
 deploy:
   on:
