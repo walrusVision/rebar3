@@ -8,12 +8,10 @@ otp_release:
   - R15B03
 before_script: "./bootstrap"
 script: "./rebar3 ct"
+after_script: "./rebar3 coveralls send"
 branches:
   only:
     - master
-cache:
-  directories:
-  - $HOME/.cache/rebar3/hex/com/amazonaws/s3/s3.hex.pm/tarballs/packages/
 before_deploy: "rm -rf !(rebar3)"
 deploy:
   on:
