@@ -100,14 +100,14 @@ download(Dir, {git, Url, ""}, State) ->
     download(Dir, {git, Url, {branch, "master"}}, State);
 download(Dir, {git, Url, {branch, Branch}}, _State) ->
     ok = filelib:ensure_dir(Dir),
-    rebar_utils:sh(?FMT("git clone ~s ~s -b ~s --single-branch",
+    rebar_utils:sh(?FMT("git clone ~s ~s -b ~s --single-branch --recursive",
                        [rebar_utils:escape_chars(Url),
                         rebar_utils:escape_chars(filename:basename(Dir)),
                         rebar_utils:escape_chars(Branch)]),
                    [{cd, filename:dirname(Dir)}]);
 download(Dir, {git, Url, {tag, Tag}}, _State) ->
     ok = filelib:ensure_dir(Dir),
-    rebar_utils:sh(?FMT("git clone ~s ~s -b ~s --single-branch",
+    rebar_utils:sh(?FMT("git clone ~s ~s -b ~s --single-branch --recursive",
                        [rebar_utils:escape_chars(Url),
                         rebar_utils:escape_chars(filename:basename(Dir)),
                         rebar_utils:escape_chars(Tag)]),
@@ -118,7 +118,8 @@ download(Dir, {git, Url, {ref, Ref}}, _State) ->
                         [rebar_utils:escape_chars(Url),
                          rebar_utils:escape_chars(filename:basename(Dir))]),
                    [{cd, filename:dirname(Dir)}]),
-    rebar_utils:sh(?FMT("git checkout -q ~s", [Ref]), [{cd, Dir}]);
+    rebar_utils:sh(?FMT("git checkout -q ~s", [Ref]), [{cd, Dir}]),
+    rebar_utils:sh("git submodule update --init --quiet", [{cd, Dir}]);
 download(Dir, {git, Url, Rev}, _State) ->
     ?WARN("WARNING: It is recommended to use {branch, Name}, {tag, Tag} or {ref, Ref}, otherwise updating the dep may not work as expected.", []),
     ok = filelib:ensure_dir(Dir),
@@ -127,7 +128,8 @@ download(Dir, {git, Url, Rev}, _State) ->
                          rebar_utils:escape_chars(filename:basename(Dir))]),
                    [{cd, filename:dirname(Dir)}]),
     rebar_utils:sh(?FMT("git checkout -q ~s", [rebar_utils:escape_chars(Rev)]),
-                   [{cd, Dir}]).
+                   [{cd, Dir}]),
+    rebar_utils:sh("git submodule update --init --quiet", [{cd, Dir}]).
 
 make_vsn(Dir) ->
     {Vsn, RawRef, RawCount} = collect_default_refcount(Dir),
